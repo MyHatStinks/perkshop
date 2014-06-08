@@ -1,0 +1,26 @@
+////////////////////
+// Perk TODO list //
+////////////////////
+
+// Juggernaut (5 lvl) //
++5 Max HP           (per level)
+-5 MoveSpeed        (per level)
+
+// Ninja (3 lvl) //
+Silent footsteps    (when equipped)
++5 crouch speed     (per level)
+
+// Scavenger (3 lvl) //
++5 Coins per Kill   (per level)      (Needs TTT checks)
+
+///////////////
+// Completed //
+///////////////
+
+// Regeneration (5 lvl) //
++1 HP/S             (per level)
+-10 Max HP          (per level)
+
+// Fortune (5 lvl) //
++1 Coin per 5Min    (global)
++1 Coin per 5Min    (per level)
