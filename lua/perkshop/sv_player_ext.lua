@@ -110,12 +110,30 @@ end
 concommand.Add( "perk_equip", function( p,c,a )
 	if not (IsValid(p)) then return end
 	local item = PerkShop:GetItem( a[2], a[1] )
-	if item then p:PerkShop_Equip( item, tonumber(a[3]) or 1 ) end
+	if item then
+		local success, err = p:PerkShop_Equip( item, tonumber(a[3]) or 1 )
+		if success then
+			p:ChatPrint( string.format( "%sEquipped %s: %s %s", PerkShop.Tag, a[1], a[2], tonumber(a[3]) and "(level "..tonumber(a[3])..")" or "" ) )
+		else
+			p:ChatPrint( string.format( "%sEquip failed. (%s)", PerkShop.Tag, err or "N/A" ) )
+		end
+	else
+		p:ChatPrint( string.format( "%sEquip failed. (Item %s_%s does not exist)", PerkShop.Tag, a[1], a[2] ) )
+	end
 end)
 concommand.Add( "perk_unequip", function( p,c,a )
 	if not (IsValid(p)) then return end
 	local item = PerkShop:GetItem( a[2], a[1] )
-	if item then p:PerkShop_Equip( item, 0 ) end
+	if item then
+		local success, err = p:PerkShop_Equip( item, 0 )
+		if success then
+			p:ChatPrint( string.format( "%sSuccessfully equipped %s: %s %s", PerkShop.Tag, a[1], a[2], tonumber(a[3]) and "("..tonumber(a[3]).." levels)" or "" ) )
+		else
+			p:ChatPrint( string.format( "%sEquip failed. (%s)", PerkShop.Tag, err or "N/A" ) )
+		end
+	else
+		p:ChatPrint( string.format( "%sEquip failed. (Item %s_%s does not exist)", PerkShop.Tag, a[1], a[2] ) )
+	end
 end)
 
 // Purchasing //

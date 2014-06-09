@@ -6,6 +6,7 @@ PerkShop:CreateCategory( "Perks" )
 local PerkRegen = {}
 PerkRegen.Cost = 300
 PerkRegen.Level = 5 // Max level
+PerkRegen.Hooks = {}
 
 function PerkRegen:OnEquip( ply, level )
 	if not (IsValid(ply) and level and level>0) then return end
@@ -22,10 +23,10 @@ function PerkRegen:OnRemove( ply, level )
 	ply.PerkRegen_HealthMod = nil
 end
 
-function PerkRegen:OnSpawn( ply, level )
+PerkRegen.Hooks.PlayerSpawn = function( self, ply, level )
 	return self:OnEquip( ply, level )
 end
-function PerkRegen:OnDie( ply, level )
+PerkRegen.Hooks.DoPlayerDeath = function( self, ply, level )
 	return self:OnRemove( ply, level )
 end
 
