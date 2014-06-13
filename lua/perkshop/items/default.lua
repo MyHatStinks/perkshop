@@ -10,7 +10,7 @@ PerkRegen.Hooks = {}
 
 function PerkRegen:OnEquip( ply, level )
 	if not (IsValid(ply) and level and level>0) then return end
-	if ply.PerkRegen_HealthMod then self:OnRemove( ply ) end // Just make sure we don't permanently lower their health accidentally
+	if ply:GetMaxHealth()==0 then return end // Spectator?
 	
 	ply.PerkRegen_HealthMod = level*10
 	ply:SetMaxHealth( ply:GetMaxHealth() - ply.PerkRegen_HealthMod )
@@ -23,7 +23,7 @@ function PerkRegen:OnRemove( ply, level )
 	ply.PerkRegen_HealthMod = nil
 end
 
-PerkRegen.Hooks.PlayerSpawn = function( self, ply, level )
+PerkRegen.Hooks.PlayerLoadout = function( self, ply, level )
 	return self:OnEquip( ply, level )
 end
 PerkRegen.Hooks.DoPlayerDeath = function( self, ply, level )
