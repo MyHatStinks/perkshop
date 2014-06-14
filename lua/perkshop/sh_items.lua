@@ -5,6 +5,8 @@ PerkShop.ItemTable = {}
 // Categories //
 function PerkShop:CreateCategory( name, data )
 	if not name then return false end
+	name = name:gsub("_"," ") // No underscores in category names
+	
 	if self.ItemTable[name] then return self.ItemTable[name] end // It's already set up
 	
 	self.ItemTable[name] = data or {}

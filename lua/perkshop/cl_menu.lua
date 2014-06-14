@@ -12,6 +12,7 @@ end
 
 surface.CreateFont( "PerkShop_Main", { font="Arial", size=30, weight=600 })
 surface.CreateFont( "PerkShop_Large", { font="Arial", size=50, weight=600 })
+surface.CreateFont( "PerkShop_Small", { font="Arial", size=14, weight=600 })
 
 function PerkShop:Open()
 	if IsValid(self.Menu) then self.Menu:Remove() end
@@ -75,4 +76,7 @@ function PerkShop:Open()
 	
 	// Item list //
 	
+	local tstItem = vgui.Create( "DPerkShopItem", pnlItems )
+	tstItem:SetSize(96,96)
+	tstItem:SetItem( "Regeneration", "Perks" )
 end
