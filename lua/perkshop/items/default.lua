@@ -10,7 +10,8 @@ PerkRegen.Hooks = {}
 
 function PerkRegen:OnEquip( ply, level )
 	if not (IsValid(ply) and level and level>0) then return end
-	if ply:GetMaxHealth()==0 then return end // Spectator?
+	if not (ply:Alive() and ply:GetObserverMode()==OBS_MODE_NONE) then return end
+	if ply:GetMaxHealth()==0 then return end
 	
 	ply.PerkRegen_HealthMod = level*10
 	ply:SetMaxHealth( ply:GetMaxHealth() - ply.PerkRegen_HealthMod )
@@ -23,11 +24,15 @@ function PerkRegen:OnRemove( ply, level )
 	ply.PerkRegen_HealthMod = nil
 end
 
-PerkRegen.Hooks.PlayerLoadout = function( self, ply, level )
-	return self:OnEquip( ply, level )
+PerkRegen.Hooks.PlayerLoadout = function( self, ply, level, plyLoadout )
+	if ply==plyLoadout then
+		return self:OnEquip( ply, level )
+	end
 end
-PerkRegen.Hooks.DoPlayerDeath = function( self, ply, level )
-	return self:OnRemove( ply, level )
+PerkRegen.Hooks.DoPlayerDeath = function( self, ply, level, plyDead )
+	if ply==plyDead then
+		return self:OnRemove( ply, level )
+	end
 end
 
 if SERVER then

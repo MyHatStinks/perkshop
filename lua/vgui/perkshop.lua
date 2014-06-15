@@ -12,16 +12,6 @@ local PANEL = {}
 
 //    Init     //
 function PANEL:Init()
-	self.btnSell = vgui.Create( "DImageButton", self )
-	self.btnSell:SetSize(16,16)
-	self.btnSell:SetPos( 2,2 )
-	self.btnSell:SetImage( "icon16/money_dollar.png" )
-	
-	self.btnBuy = vgui.Create( "DImageButton", self )
-	self.btnBuy:SetSize( 16,16 )
-	self.btnBuy:SetPos( 2, 20 )
-	self.btnBuy:SetImage( "icon16/box.png" )
-	
 	self:SetAnimated( true )
 	
 	self.perkItem = nil
@@ -29,11 +19,6 @@ end
 
 //     Layout     ///
 function PANEL:PerformLayout()
-	self.btnSell:SetSize( 16,16 )
-	self.btnSell:SetPos( 2,2 )
-	
-	self.btnBuy:SetSize( 16,16 )
-	self.btnBuy:SetPos( 2, self:GetTall()-18 )
 end
 function PANEL:LayoutEntity( Entity )
 	if not Entity.IsSetup then
@@ -53,8 +38,32 @@ function PANEL:LayoutEntity( Entity )
 	Entity:SetAngles( Angle( 0, RealTime()*10,  0) )
 end
 
+//     Do Click     //
+function PANEL:DoClick()
+	if not self.perkItem then return end
+	if not self.SelectedLevel then return end
+	
+	if self.ShowBuyMenu then
+		local HasLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
+		if self.SelectedLevel>HasLevel then
+			RunConsoleCommand( "perk_buy", self.perkItem.Category, self.perkItem.Class, self.SelectedLevel )
+		elseif self.SelectedLevel<HasLevel then
+			RunConsoleCommand( "perk_sell", self.perkItem.Category, self.perkItem.Class, HasLevel-self.SelectedLevel )
+		end
+	elseif self.ShowEquipMenu then
+		local EqpLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
+		if self.SelectedLevel~=EqpLevel then
+			RunConsoleCommand( "perk_equip", self.perkItem.Category, self.perkItem.Class, self.SelectedLevel )
+		end
+	end
+end
+
 //     Paint     //
 local colWhite, colGray, colRed = Color(255,255,255),Color(155,0,0), Color(100,100,100, 150)
+local ItemCol = {
+	LevelEquipped = Color(240,240,60), LevelOwned = Color(140,140,60), LevelUnowned = Color(60,60,60), LevelHover = Color(255,255,255,20), LevelBG = Color(0,0,0,100)
+}
+local matBuy,matEquip = Material("icon16/money_dollar.png"), Material("icon16/box.png")
 function PANEL:Paint(w,h)
 	if not self.perkItem then
 		surface.SetDrawColor( colRed )
@@ -71,7 +80,76 @@ function PANEL:Paint(w,h)
 	
 	self.BaseClass.Paint( self,w,h )
 	
-	ShadowText( self.perkItem.Class, "PerkShop_Small", w/2, h-30, colWhite, TEXT_ALIGN_CENTER )
+	surface.SetDrawColor( colWhite )
+	surface.SetMaterial( matBuy )
+	surface.DrawTexturedRect( 2,2, 16,16 )
+	
+	surface.SetMaterial( matEquip )
+	surface.DrawTexturedRect( 2,h-18, 16,16 )
+	
+	local lvlSpacing = (self:GetWide()-24) / (self.perkItem.Level or 1)
+	local x,y = self:LocalCursorPos()
+	
+	self.SelectedLevel = nil
+	if self.ShowBuyMenu then
+		local HasLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
+		
+		draw.RoundedBox( 2, 20,2, self:GetWide()-24, 16, ItemCol.LevelBG )
+		for i=1,(self.perkItem.Level or 1) do
+			draw.RoundedBox( 2, 22+(lvlSpacing*(i-1)),4, lvlSpacing-4, 12, i<=HasLevel and ItemCol.LevelEquipped or ItemCol.LevelUnowned )
+			
+			if (x-20)>lvlSpacing*(i-1) and (x-20)<lvlSpacing*(i) then
+				self.SelectedLevel = i
+				draw.RoundedBox( 2, 20+(lvlSpacing*(i-1)),2, lvlSpacing, 16, ItemCol.LevelHover )
+			end
+		end
+		
+		if x<=18 then self.SelectedLevel = 0 end
+	elseif self.ShowEquipMenu then
+		local HasLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
+		local EqpLevel = LocalPlayer():PerkShop_ItemLevel( self.perkItem.Classname )
+		
+		draw.RoundedBox( 2, 20,h-16, self:GetWide()-24, 16, ItemCol.LevelBG )
+		for i=1,(self.perkItem.Level or 1) do
+			draw.RoundedBox( 2, 22+(lvlSpacing*(i-1)),h-14, lvlSpacing-4, 12,
+				(i<=EqpLevel and ItemCol.LevelEquipped) or (i<=HasLevel and ItemCol.LevelOwned) or ItemCol.LevelUnowned )
+			
+			if (x-20)>lvlSpacing*(i-1) and (x-20)<lvlSpacing*(i) then
+				self.SelectedLevel = i
+				draw.RoundedBox( 2, 20+(lvlSpacing*(i-1)),h-16, lvlSpacing, 16, ItemCol.LevelHover )
+			end
+		end
+		
+		if x<=18 then self.SelectedLevel = 0 end
+	end
+	
+	ShadowText( self.perkItem.Class, "PerkShop_Small", w/2, h-35, colWhite, TEXT_ALIGN_CENTER )
+end
+
+function PANEL:Think()
+	if not self.perkItem then return end
+	if not self:IsHovered() then
+		self.ShowBuyMenu = false
+		self.ShowEquipMenu = false
+		return
+	end
+	
+	local x,y = self:LocalCursorPos()
+	if y<18 then
+		if x<18 then
+			self.ShowBuyMenu = true
+		end
+	else
+		self.ShowBuyMenu = false
+	end
+	
+	if y>(self:GetTall()-18) then
+		if x<18 then
+			self.ShowEquipMenu = true
+		end
+	else
+		self.ShowEquipMenu = false
+	end
 end
 
 //     Item     //
