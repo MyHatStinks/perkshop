@@ -111,9 +111,14 @@ concommand.Add( "perk_equip", function( p,c,a )
 	if not (IsValid(p)) then return end
 	local item = PerkShop:GetItem( a[2], a[1] )
 	if item then
-		local success, err = p:PerkShop_Equip( item, tonumber(a[3]) or 1 )
+		local newLevel = tonumber(a[3]) or 1
+		local success, err = p:PerkShop_Equip( item, newLevel )
 		if success then
-			p:ChatPrint( string.format( "%sEquipped %s: %s %s", PerkShop.Tag, a[1], a[2], tonumber(a[3]) and "(level "..tonumber(a[3])..")" or "" ) )
+			if newLevel==0 then
+				p:ChatPrint( string.format( "%sUnequipped %s: %s", PerkShop.Tag, a[1], a[2] ) )
+			else
+				p:ChatPrint( string.format( "%sEquipped %s: %s %s", PerkShop.Tag, a[1], a[2], newLevel~=1 and "(level "..newLevel..")" or "" ) )
+			end
 		else
 			p:ChatPrint( string.format( "%sEquip failed. (%s)", PerkShop.Tag, err or "N/A" ) )
 		end
@@ -127,12 +132,12 @@ concommand.Add( "perk_unequip", function( p,c,a )
 	if item then
 		local success, err = p:PerkShop_Equip( item, 0 )
 		if success then
-			p:ChatPrint( string.format( "%sSuccessfully equipped %s: %s %s", PerkShop.Tag, a[1], a[2], tonumber(a[3]) and "("..tonumber(a[3]).." levels)" or "" ) )
+			p:ChatPrint( string.format( "%sUnequipped %s: %s %s", PerkShop.Tag, a[1], a[2], tonumber(a[3]) and "(level "..tonumber(a[3])..")" or "" ) )
 		else
-			p:ChatPrint( string.format( "%sEquip failed. (%s)", PerkShop.Tag, err or "N/A" ) )
+			p:ChatPrint( string.format( "%sUnequip failed. (%s)", PerkShop.Tag, err or "N/A" ) )
 		end
 	else
-		p:ChatPrint( string.format( "%sEquip failed. (Item %s_%s does not exist)", PerkShop.Tag, a[1], a[2] ) )
+		p:ChatPrint( string.format( "%sUnequip failed. (Item %s_%s does not exist)", PerkShop.Tag, a[1], a[2] ) )
 	end
 end)
 
@@ -164,13 +169,17 @@ function PLAYER:PerkShop_Sell( item, sellLevels )
 	local oldLevel = self:PerkShop_HasItem( item.Classname )
 	if not oldLevel then return false,"Attempting to sell unowned item" end
 	
+	
 	local newLevel = (sellLevels==0 and 0) or math.max(oldLevel-sellLevels,0)
 	if oldLevel<newLevel then return false,"Attempting to sell level higher than owned" end
+	
+	local equipped = self:PerkShop_Equip( item, math.max(oldLevel-sellLevels,0) )
+	if not equipped then self:PerkShop_Equip( item, 0 ) end
 	
 	local refund,err = PerkShop:GetCost( item.Class, item.Category, oldLevel, newLevel or 1 )
 	if refund==-1 then return false,err or "Failed to calculate value" end
 	
-	refund = refund*0.75
+	refund = math.floor(refund*0.75)
 	
 	local success,err = self:PerkShop_GivePoints( refund )
 	if not success then return false,err or "Failed to refund "..PerkShop.PointsLabel end

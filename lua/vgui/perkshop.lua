@@ -51,7 +51,7 @@ function PANEL:DoClick()
 			RunConsoleCommand( "perk_sell", self.perkItem.Category, self.perkItem.Class, HasLevel-self.SelectedLevel )
 		end
 	elseif self.ShowEquipMenu then
-		local EqpLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
+		local EqpLevel = LocalPlayer():PerkShop_ItemLevel( self.perkItem.Classname )
 		if self.SelectedLevel~=EqpLevel then
 			RunConsoleCommand( "perk_equip", self.perkItem.Category, self.perkItem.Class, self.SelectedLevel )
 		end
