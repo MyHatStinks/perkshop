@@ -45,21 +45,22 @@ function PerkShop:Open()
 	
 	local pnlItems = vgui.Create( "DPanel", self.Menu )
 	pnlItems:Dock( FILL )
+	pnlItems.Paint = function() end
 	
 	// Buttons //
-	btnItems = vgui.Create( "DButton", pnlButton )
-	btnItems:Dock( LEFT )
-	btnItems:SetWide( 195 )
-	btnItems:SetText( "Shop" )
+	-- btnItems = vgui.Create( "DButton", pnlButton )
+	-- btnItems:Dock( LEFT )
+	-- btnItems:SetWide( 195 )
+	-- btnItems:SetText( "Shop" )
 	
-	btnMisc = vgui.Create( "DButton", pnlButton )
-	btnMisc:Dock( RIGHT )
-	btnMisc:SetWide( 195 )
-	btnMisc:SetText( "[[TODO:Make this do something]]" )
+	-- btnMisc = vgui.Create( "DButton", pnlButton )
+	-- btnMisc:Dock( RIGHT )
+	-- btnMisc:SetWide( 195 )
+	-- btnMisc:SetText( "[[TODO:Make this do something]]" )
 	
-	btnInventory = vgui.Create( "DButton", pnlButton )
-	btnInventory:Dock( FILL )
-	btnInventory:SetText( "Inventory" )
+	-- btnInventory = vgui.Create( "DButton", pnlButton )
+	-- btnInventory:Dock( FILL )
+	-- btnInventory:SetText( "Inventory" )
 	
 	// Item preview //
 	local ply = LocalPlayer()
@@ -75,8 +76,32 @@ function PerkShop:Open()
 	end
 	
 	// Item list //
-	
-	local tstItem = vgui.Create( "DPerkShopItem", pnlItems )
-	tstItem:SetSize(128,128)
-	tstItem:SetItem( "Regeneration", "Perks" )
+	local pnlItemList = vgui.Create( "DPropertySheet", pnlItems )
+	pnlItemList:Dock( FILL )
+	pnlItemList.Empty = function(s)
+		if not s.Items then return end
+		
+		for _,itm in pairs( s.Items ) do s:CloseTab( s.Items.Tab, true ) end
+	end
+	pnlItemList.Update = function(s)
+		s:Empty()
+		
+		if not PerkShop then return end
+		if not PerkShop.ItemTable then return end
+		
+		for catName,cat in pairs( PerkShop.ItemTable ) do
+			if not cat.Items then continue end
+			
+			local IconFrame = vgui.Create( "DIconLayout", s )
+			IconFrame:SetSpaceX( 5 )
+			local Sheet = s:AddSheet( catName, IconFrame, "icon16/cake.png" )
+			
+			for itemName,item in pairs(cat.Items) do
+				local listItem = IconFrame:Add( "DPerkShopItem" )
+				listItem:SetSize( 128, 128 )
+				listItem:SetItem( itemName, catName )
+			end
+		end
+	end
+	pnlItemList:Update()
 end
