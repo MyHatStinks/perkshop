@@ -71,7 +71,8 @@ function PANEL:Paint(w,h)
 		return
 	end
 	
-	draw.RoundedBox( 4, 0,0, w,h, colRed )
+	surface.SetDrawColor( colRed )
+	surface.DrawRect( 0,0, w,h )
 	if self.itmMaterial then
 		surface.SetDrawColor( colGray )
 		surface.SetMaterial( self.itmMaterial )
@@ -93,34 +94,54 @@ function PANEL:Paint(w,h)
 	self.SelectedLevel = nil
 	if self.ShowBuyMenu then
 		local HasLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
-		
-		draw.RoundedBox( 2, 20,2, self:GetWide()-24, 16, ItemCol.LevelBG )
+		surface.SetDrawColor( ItemCol.LevelBG )
+		surface.DrawRect( 20,2, self:GetWide()-24, 16 )
 		for i=1,(self.perkItem.Level or 1) do
-			draw.RoundedBox( 2, 22+(lvlSpacing*(i-1)),4, lvlSpacing-4, 12, i<=HasLevel and ItemCol.LevelEquipped or ItemCol.LevelUnowned )
+			surface.SetDrawColor( i<=HasLevel and ItemCol.LevelEquipped or ItemCol.LevelUnowned )
+			surface.DrawRect( 22+(lvlSpacing*(i-1)),4, lvlSpacing-4, 12 )
 			
 			if (x-20)>lvlSpacing*(i-1) and (x-20)<lvlSpacing*(i) then
 				self.SelectedLevel = i
-				draw.RoundedBox( 2, 20+(lvlSpacing*(i-1)),2, lvlSpacing, 16, ItemCol.LevelHover )
+				surface.SetDrawColor( ItemCol.LevelHover )
+				surface.DrawRect( 20+(lvlSpacing*(i-1)),2, lvlSpacing, 16 )
 			end
 		end
 		
 		if x<=18 then self.SelectedLevel = 0 end
+		
+		local diff = (self.SelectedLevel or 0) - HasLevel
+		if diff~=0 then
+			local cost = PerkShop:GetCost( self.perkItem.Class, self.perkItem.Category, HasLevel, self.SelectedLevel or 0 ) or -1
+			if diff<0 then
+				cost = cost * (0.75)
+			end
+			ShadowText( Format( "%s %s level%s", diff>0 and "Buy" or "Sell", math.abs(diff), (diff~=1 and diff~=-1) and "s" or "" ), "PerkShop_Tiny", w/2, 20, colWhite, TEXT_ALIGN_CENTER )
+			ShadowText( cost, "PerkShop_Tiny", w/2, 32, colWhite, TEXT_ALIGN_CENTER )
+		end
+		
 	elseif self.ShowEquipMenu then
 		local HasLevel = LocalPlayer():PerkShop_HasItem( self.perkItem.Classname ) or 0
 		local EqpLevel = LocalPlayer():PerkShop_ItemLevel( self.perkItem.Classname )
 		
-		draw.RoundedBox( 2, 20,h-16, self:GetWide()-24, 16, ItemCol.LevelBG )
+		surface.SetDrawColor( ItemCol.LevelBG )
+		surface.DrawRect( 20,h-16, self:GetWide()-24, 16 )
 		for i=1,(self.perkItem.Level or 1) do
-			draw.RoundedBox( 2, 22+(lvlSpacing*(i-1)),h-14, lvlSpacing-4, 12,
-				(i<=EqpLevel and ItemCol.LevelEquipped) or (i<=HasLevel and ItemCol.LevelOwned) or ItemCol.LevelUnowned )
+			surface.SetDrawColor( (i<=EqpLevel and ItemCol.LevelEquipped) or (i<=HasLevel and ItemCol.LevelOwned) or ItemCol.LevelUnowned )
+			surface.DrawRect( 22+(lvlSpacing*(i-1)),h-14, lvlSpacing-4, 12 )
 			
 			if (x-20)>lvlSpacing*(i-1) and (x-20)<lvlSpacing*(i) then
 				self.SelectedLevel = i
-				draw.RoundedBox( 2, 20+(lvlSpacing*(i-1)),h-16, lvlSpacing, 16, ItemCol.LevelHover )
+				surface.SetDrawColor( ItemCol.LevelHover )
+				surface.DrawRect( 20+(lvlSpacing*(i-1)),h-16, lvlSpacing, 16 )
 			end
 		end
 		
 		if x<=18 then self.SelectedLevel = 0 end
+		
+		local diff = (self.SelectedLevel or 0) - EqpLevel
+		if diff~=0 and (self.SelectedLevel or 0)<=HasLevel then
+			ShadowText( Format( "%s %s level%s", diff>0 and "Equip" or "Unequip", math.abs(diff), (diff~=1 and diff~=-1) and "s" or "" ), "PerkShop_Tiny", w/2, 20, colWhite, TEXT_ALIGN_CENTER )
+		end
 	end
 	
 	ShadowText( self.perkItem.Class, "PerkShop_Small", w/2, h-35, colWhite, TEXT_ALIGN_CENTER )

@@ -13,7 +13,15 @@ end
 surface.CreateFont( "PerkShop_Main", { font="Arial", size=30, weight=600 })
 surface.CreateFont( "PerkShop_Large", { font="Arial", size=50, weight=600 })
 surface.CreateFont( "PerkShop_Small", { font="Arial", size=18, weight=600 })
+surface.CreateFont( "PerkShop_Tiny", { font="Arial", size=15, weight=600 })
 
+PerkShop.Colors = {
+	A = Color( 34, 32, 43 ), B = Color( 56, 55, 69 ), C = Color( 125, 105, 98 ),
+	D = Color( 202, 141, 110 ), E = Color( 249, 174, 116 ),
+	
+	Close = Color(225,50,25), White = Color(255,255,255),
+}
+local Col = PerkShop.Colors
 function PerkShop:Open()
 	if IsValid(self.Menu) then self.Menu:Remove() end
 	
@@ -27,19 +35,46 @@ function PerkShop:Open()
 	
 	// Frame //
 	self.Menu = vgui.Create( "DFrame" )
-	self.Menu:SetSize( 600, math.min(600,h) )
-	self.Menu:SetPos( (w/2)-300, (h/2)-(self.Menu:GetTall()/2) )
+	self.Menu:SetSize( math.min(1000,w), math.min(800,h) )
+	self.Menu:SetPos( (w/2)-(self.Menu:GetWide()/2), (h/2)-(self.Menu:GetTall()/2) )
 	self.Menu:SetTitle( "Perkshop" )
+	self.Menu:ShowCloseButton( false )
 	self.Menu:MakePopup()
 	
+	self.Menu.Paint = function( s,w,h )
+		surface.SetDrawColor( Col.A )
+		surface.DrawRect( 0,0, w,h )
+		
+		-- surface.SetDrawColor( Col.B )
+		-- surface.DrawRect( 0,0, w,20 )
+	end
+	
+	local CloseButton = vgui.Create( "DButton", self.Menu )
+	CloseButton:SetSize( 30, 20 )
+	CloseButton:SetPos( self.Menu:GetWide()-32, 2 )
+	CloseButton:SetText( "" )
+	CloseButton.DoClick = function()
+		self.Menu:Remove()
+	end
+	
+	surface.SetFont( "PerkShop_Tiny" )
+	local _,TextHeight = surface.GetTextSize("X")
+	CloseButton.Paint = function( s,w,h )
+		surface.SetDrawColor( Col.Close )
+		surface.DrawRect( 0,0, w,h )
+		
+		draw.DrawText( "X", "PerkShop_Tiny", w/2, (h/2)-(TextHeight/2), Col.White, TEXT_ALIGN_CENTER )
+	end
+	
 	// Layout //
-	local pnlButton = vgui.Create( "DPanel", self.Menu )
-	pnlButton:Dock( TOP )
-	pnlButton:SetTall( 40 )
-	pnlButton.Paint = function() end
+	-- local pnlButton = vgui.Create( "DPanel", self.Menu )
+	-- pnlButton:Dock( TOP )
+	-- pnlButton:SetTall( 40 )
+	-- pnlButton.Paint = function() end
 	
 	local pnlPreview = vgui.Create( "DPanel", self.Menu )
 	pnlPreview:Dock( RIGHT )
+	pnlPreview:DockPadding(2,2,2,3)
 	pnlPreview:SetWide( 250 )
 	pnlPreview.Paint = function() end
 	
@@ -70,7 +105,9 @@ function PerkShop:Open()
 	pnlStatus.Paint = function( s, w,h )
 		if not IsValid(ply) then ply=LocalPlayer() return end
 		
-		draw.RoundedBox( 2, 0,0, w,h, PanelColor.dbgPnl )
+		surface.SetDrawColor( Col.B )
+		surface.DrawRect( 0,0, w,h )
+		
 		ShadowText( self.PointsLabel or "[PointLabel]", "PerkShop_Main", 10,10, PanelColor.Text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 		ShadowText( ply:PerkShop_Points(), "PerkShop_Large", w/2,50, PanelColor.Text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	end
@@ -78,6 +115,7 @@ function PerkShop:Open()
 	// Item list //
 	local pnlItemList = vgui.Create( "DPropertySheet", pnlItems )
 	pnlItemList:Dock( FILL )
+	pnlItemList:SetPadding( 7 )
 	pnlItemList.Empty = function(s)
 		if not s.Items then return end
 		
@@ -95,6 +133,10 @@ function PerkShop:Open()
 			local IconFrame = vgui.Create( "DIconLayout", s )
 			IconFrame:SetSpaceX( 5 )
 			local Sheet = s:AddSheet( catName, IconFrame, "icon16/cake.png" )
+			Sheet.Tab.Paint = function( s,w,h )
+				-- surface.SetDrawColor( Col.B )
+				-- surface.DrawOutlinedRect( 0,0, w,h )
+			end
 			
 			for itemName,item in pairs(cat.Items) do
 				local listItem = IconFrame:Add( "DPerkShopItem" )
@@ -104,4 +146,13 @@ function PerkShop:Open()
 		end
 	end
 	pnlItemList:Update()
+	
+	pnlItemList.tabScroller.Paint = function( s,w,h )
+		surface.SetDrawColor( Col.C )
+		surface.DrawRect( 0,0, w,h-3 )
+	end
+	pnlItemList.Paint = function( s,w,h )
+		surface.SetDrawColor( Col.B )
+		surface.DrawRect( 0,0, w,h-3 )
+	end
 end

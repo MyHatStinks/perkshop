@@ -43,7 +43,7 @@ function PerkShop:CreateItem( name, cat, data )
 	local tblCat = self:GetCategory( cat )
 	if not (tblCat and tblCat.Items) then return false end // This shouldn't happen
 	
-	// if tblCat[name] then return false end // An item of this name already exists
+	-- if tblCat[name] then return false end // An item of this name already exists
 	
 	tblCat.Items[name] = data
 	
@@ -143,16 +143,16 @@ function PerkShop:LoadItems()
 	if true then return end // TODO: Complete this stuff
 	// Pointshop compatibility //
 	// My system is neater, but compatibility...
-	if not file.IsDir( "items", "LUA" ) then return end // Good news, we're not converting any pointshop items!
-	local _,pointDir = file.Find( "items/*", "LUA" )
+	if not file.IsDir( "pointshop/items", "LUA" ) then return end // Good news, we're not converting any pointshop items!
+	local _,pointDir = file.Find( "pointshop/items/*", "LUA" )
 	
 	for _,pointCatName in pairs(pointDir) do
-		if not file.Exists( "items/"..pointCatName.."/__category.lua", "LUA" ) then continue end
+		if not file.Exists( "pointshop/items/"..pointCatName.."/__category.lua", "LUA" ) then continue end
 		
-		CATEGORY = {} // Why global?
+		CATEGORY = {} // Why global? Because pointshop
 		
-		if SERVER then AddCSLuaFile("items/"..pointCatName.."/__category.lua") end
-		include( "items/"..pointCatName.."/__category.lua" )
+		if SERVER then AddCSLuaFile("pointshop/items/"..pointCatName.."/__category.lua") end
+		include( "pointshop/items/"..pointCatName.."/__category.lua" )
 		
 		if not CATEGORY.Name then continue end // No name, no category
 		
@@ -166,14 +166,14 @@ function PerkShop:LoadItems()
 		self:CreateCategory( CATEGORY.Name, newCat ) // Make the category
 		
 		// Now for items //
-		local pointItemFiles = file.Find( "items/"..pointCatName.."/*.lua", "LUA" )
+		local pointItemFiles = file.Find( "pointshop/items/"..pointCatName.."/*.lua", "LUA" )
 		for _,pointFileName in pairs( pointItemFiles ) do
 			if pointFileName=="__category.lua" then continue end
 			
 			ITEM = {}
 			
-			if SERVER then AddCSLuaFile("items/"..pointCatName.."/"..pointFileName..".lua") end
-			include( "items/"..pointCatName.."/"..pointFileName..".lua" )
+			if SERVER then AddCSLuaFile("pointshop/items/"..pointCatName.."/"..pointFileName..".lua") end
+			include( "pointshop/items/"..pointCatName.."/"..pointFileName..".lua" )
 			
 			if not ITEM.Name then continue end
 			
@@ -182,5 +182,8 @@ function PerkShop:LoadItems()
 			// TODO: Create Item
 		end
 	end
+	
+	CATEGORY = nil
+	ITEM = nil
 end
 PerkShop:LoadItems()
