@@ -1,4 +1,12 @@
-// Perkshop Autorun //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- autorun/sh_perkshop.lua     CLIENT --
+--                                    --
+-- Autorun.                           --
+----------------------------------------
 
 PerkShop = PerkShop or {}
 PerkShop.ShopName = "PerkShop" // This'll show in a few places

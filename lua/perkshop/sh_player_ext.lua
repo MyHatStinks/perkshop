@@ -1,4 +1,12 @@
-// PerkShop Player Extensions (Shared) //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- sh_player_ext.lua           SHARED --
+--                                    --
+-- Shared Player metatable extensions.--
+----------------------------------------
 
 local PLAYER = FindMetaTable( "Player" )
 

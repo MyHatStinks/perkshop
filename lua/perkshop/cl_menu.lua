@@ -1,12 +1,24 @@
-// Perkshop Menu //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- cl_menu.lua                 CLIENT --
+--                                    --
+-- Perkshop Menu.                     --
+----------------------------------------
 
-local PanelColor = {
-	Text = Color(255,255,255,255), TextShadow = Color(0,0,0,255),
+PerkShop.Colors = {
+	A = Color( 34, 32, 43 ), B = Color( 56, 55, 69 ), C = Color( 125, 105, 98 ),
+	D = Color( 202, 141, 110 ), E = Color( 249, 174, 116 ),
 	
-	dbgPnl = Color(150,150,180,150)
+	Close = Color(225,50,25), White = Color(255,255,255),
+	Text = Color(255,255,255,255), TextShadow = Color(0,0,0,255),
 }
+local Col = PerkShop.Colors
+
 local function ShadowText( str, font, x,y, col, xAlign, yAlign )
-	draw.DrawText( str, font, x+1, y+1, PanelColor.TextShadow, xAlign, yAlign )
+	draw.DrawText( str, font, x+1, y+1, Col.TextShadow, xAlign, yAlign )
 	draw.DrawText( str, font, x, y, col, xAlign, yAlign )
 end
 
@@ -15,13 +27,6 @@ surface.CreateFont( "PerkShop_Large", { font="Arial", size=50, weight=600 })
 surface.CreateFont( "PerkShop_Small", { font="Arial", size=18, weight=600 })
 surface.CreateFont( "PerkShop_Tiny", { font="Arial", size=15, weight=600 })
 
-PerkShop.Colors = {
-	A = Color( 34, 32, 43 ), B = Color( 56, 55, 69 ), C = Color( 125, 105, 98 ),
-	D = Color( 202, 141, 110 ), E = Color( 249, 174, 116 ),
-	
-	Close = Color(225,50,25), White = Color(255,255,255),
-}
-local Col = PerkShop.Colors
 function PerkShop:Open()
 	if IsValid(self.Menu) then self.Menu:Remove() end
 	
@@ -108,8 +113,8 @@ function PerkShop:Open()
 		surface.SetDrawColor( Col.B )
 		surface.DrawRect( 0,0, w,h )
 		
-		ShadowText( self.PointsLabel or "[PointLabel]", "PerkShop_Main", 10,10, PanelColor.Text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
-		ShadowText( ply:PerkShop_Points(), "PerkShop_Large", w/2,50, PanelColor.Text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		ShadowText( self.PointsLabel or "[PointLabel]", "PerkShop_Main", 10,10, Col.Text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+		ShadowText( ply:PerkShop_Points(), "PerkShop_Large", w/2,50, Col.Text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	end
 	
 	// Item list //

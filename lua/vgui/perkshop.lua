@@ -1,4 +1,12 @@
-// Perkshop custom panels //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- vgui/perkshop.lua           CLIENT --
+--                                    --
+-- Perkshop custom VGUI panels.       --
+----------------------------------------
 
 local function ShadowText( str, font, x,y, col, xAlign, yAlign )
 	draw.DrawText( str, font, x+1, y+1, Color(0,0,0), xAlign, yAlign )

@@ -1,4 +1,12 @@
-// Perkshop Client //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- cl_init.lua                 CLIENT --
+--                                    --
+-- Clientside intialisation stuff.    --
+----------------------------------------
 
 // Hooks //
 hook.Add( "PlayerBindPress", "PerkShop_Bind_Open", function( ply, bind, pressed )

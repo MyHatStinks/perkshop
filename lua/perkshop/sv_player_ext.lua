@@ -1,4 +1,13 @@
-// PerkShop Player Extensions (Server) //
+----------------------------------------
+--------------- Perkshop ---------------
+----------------------------------------
+------- Created by my_hat_stinks -------
+----------------------------------------
+-- sv_player_ext.lua           SERVER --
+--                                    --
+-- Server-side Player metatable       --
+-- extensions.                        --
+----------------------------------------
 
 local PLAYER = FindMetaTable( "Player" )
 
